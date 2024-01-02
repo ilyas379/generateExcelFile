@@ -7,7 +7,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -29,7 +28,7 @@ public class ExcelGenerator {
         try (FileInputStream fis = new FileInputStream(fileName)) {
             prop.load(fis);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            System.out.println(ex.getMessage());
         }
 
         costOfOneDfa = Double.valueOf(prop.getProperty("app.costOfOneDFA"));
@@ -202,6 +201,4 @@ public class ExcelGenerator {
         Date date = new Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(duration));
         return formatter.format(date);
     }
-
-
 }
