@@ -38,7 +38,6 @@ public class ExcelGenerator {
         rate = Double.parseDouble(prop.getProperty("app.rate"));
         //проценты за 1 ЦФА
         percentForOneDfa = (rate*costOfOneDfa)/100;
-
     }
 
     public static void main(String[] args) {
