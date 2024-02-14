@@ -43,10 +43,10 @@ public class ExcelGenerator {
     @SneakyThrows
     public static void main(String[] args) {
         log.info("Start generate Excel files");
-        createAccrualNPDSheet();
-        createPaymentNPDSheet();
+//        createAccrualNPDSheet();
+//        createPaymentNPDSheet();
         createAccrualODSheet();
-        createPaymentODSheet();
+//        createPaymentODSheet();
         log.info("Generate Excel files success");
     }
 
@@ -150,6 +150,7 @@ public class ExcelGenerator {
         CellStyle cellStyle = wb.createCellStyle();
         CreationHelper creationHelper = wb.getCreationHelper();
         cellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("dd/mm/yy h:mm;@"));
+//        cellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("#,##0.00"));
 
         Cell cell01 = row0.createCell(0);
         cell01.setCellValue("Дата начисления");
@@ -222,7 +223,7 @@ public class ExcelGenerator {
     }
 
     public static String createDate(long duration)  {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yy HH:mm");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy  H:mm:ss");
         Date date = new Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(duration));
         return formatter.format(date);
     }

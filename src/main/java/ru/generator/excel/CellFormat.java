@@ -19,7 +19,7 @@ public class CellFormat {
         Workbook workbook = WorkbookFactory.create(fileIn);
         CellStyle cellStyle = workbook.getSheetAt(0).getRow(1).getCell(0).getCellStyle();
         String styleString = cellStyle.getDataFormatString();
-        log.info("Формат яейки следующий:");
+        log.info("Формат ячейки следующий:");
         System.out.println(styleString);
     }
 
