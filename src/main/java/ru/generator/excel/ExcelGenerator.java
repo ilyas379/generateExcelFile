@@ -4,21 +4,21 @@ import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 @Log4j2
 public class ExcelGenerator {
     static Double costOfOneDfa;
     static Double numberOfSaleDFA;
     static Double summCostSaleDFA;
-    static long duration;
+    static int duration;
     static Double percentForOneDfa;
     static Double rate;
     static String fileName = "config.properties";
@@ -33,7 +33,7 @@ public class ExcelGenerator {
 
         costOfOneDfa = Double.valueOf(prop.getProperty("app.costOfOneDFA"));
         numberOfSaleDFA = Double.valueOf(prop.getProperty("app.numberOfSaleDFA"));
-        duration = Long.parseLong(prop.getProperty("app.duration"));
+        duration = Integer.parseInt(prop.getProperty("app.duration"));
         summCostSaleDFA = costOfOneDfa * numberOfSaleDFA;
         rate = Double.parseDouble(prop.getProperty("app.rate"));
         //проценты за 1 ЦФА
@@ -43,10 +43,10 @@ public class ExcelGenerator {
     @SneakyThrows
     public static void main(String[] args) {
         log.info("Start generate Excel files");
-//        createAccrualNPDSheet();
-//        createPaymentNPDSheet();
+        createAccrualNPDSheet();
+        createPaymentNPDSheet();
         createAccrualODSheet();
-//        createPaymentODSheet();
+        createPaymentODSheet();
         log.info("Generate Excel files success");
     }
 
@@ -59,8 +59,7 @@ public class ExcelGenerator {
         Row row1 = sheet0.createRow(1);
 
         CellStyle cellStyle = wb.createCellStyle();
-        CreationHelper creationHelper = wb.getCreationHelper();
-        cellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("dd/mm/yy h:mm;@"));
+        cellStyle.setDataFormat(wb.getCreationHelper().createDataFormat().getFormat("dd.MM.yyyy HH:mm:ss"));
 
         Cell cell01 = row0.createCell(0);
         cell01.setCellValue("Дата начисления");
@@ -88,15 +87,14 @@ public class ExcelGenerator {
         }
     }
 
-    public static void createPaymentNPDSheet(){
+    public static void createPaymentNPDSheet() {
         Workbook wb = new XSSFWorkbook();
         Sheet sheet0 = wb.createSheet("График выплаты НПД");
         Row row0 = sheet0.createRow(0);
         Row row1 = sheet0.createRow(1);
 
         CellStyle cellStyle = wb.createCellStyle();
-        CreationHelper creationHelper = wb.getCreationHelper();
-        cellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("dd/mm/yy h:mm;@"));
+        cellStyle.setDataFormat(wb.getCreationHelper().createDataFormat().getFormat("dd.MM.yyyy HH:mm:ss"));
 
         Cell cell01 = row0.createCell(0);
         cell01.setCellValue("Дата закрытия реестра");
@@ -111,19 +109,19 @@ public class ExcelGenerator {
         cell04.setCellValue("Сумма к выплате");
 
         Cell cell11 = row1.createCell(0);
-        cell11.setCellValue(createDate(duration+1));
+        cell11.setCellValue(createDate(duration + 1));
         cell11.setCellStyle(cellStyle);
 
         Cell cell12 = row1.createCell(1);
-        cell12.setCellValue(createDate(duration+2));
+        cell12.setCellValue(createDate(duration + 2));
         cell12.setCellStyle(cellStyle);
 
         Cell cell13 = row1.createCell(2);
-        cell13.setCellValue(createDate(duration+3));
+        cell13.setCellValue(createDate(duration + 3));
         cell13.setCellStyle(cellStyle);
 
         Cell cell14 = row1.createCell(3);
-        cell14.setCellValue((costOfOneDfa*rate)/100);
+        cell14.setCellValue((costOfOneDfa * rate) / 100);
 
         sheet0.autoSizeColumn(0);
         sheet0.autoSizeColumn(1);
@@ -140,7 +138,7 @@ public class ExcelGenerator {
         }
     }
 
-    public static void createAccrualODSheet () {
+    public static void createAccrualODSheet() {
 
         Workbook wb = new XSSFWorkbook();
         Sheet sheet0 = wb.createSheet("График начисления ОД");
@@ -148,9 +146,7 @@ public class ExcelGenerator {
         Row row1 = sheet0.createRow(1);
 
         CellStyle cellStyle = wb.createCellStyle();
-        CreationHelper creationHelper = wb.getCreationHelper();
-        cellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("dd/mm/yy h:mm;@"));
-//        cellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("#,##0.00"));
+        cellStyle.setDataFormat(wb.getCreationHelper().createDataFormat().getFormat("dd.MM.yyyy HH:mm:ss"));
 
         Cell cell01 = row0.createCell(0);
         cell01.setCellValue("Дата начисления");
@@ -159,11 +155,11 @@ public class ExcelGenerator {
         cell02.setCellValue("Сумма к начислению");
 
         Cell cell11 = row1.createCell(0);
-        cell11.setCellValue(createDate(duration+4));
+        cell11.setCellValue(createDate(duration + 4));
         cell11.setCellStyle(cellStyle);
 
         Cell cell12 = row1.createCell(1);
-        cell12.setCellValue(costOfOneDfa*numberOfSaleDFA);
+        cell12.setCellValue(costOfOneDfa * numberOfSaleDFA);
 
         sheet0.autoSizeColumn(0);
         sheet0.autoSizeColumn(1);
@@ -178,7 +174,7 @@ public class ExcelGenerator {
         }
     }
 
-    public static void createPaymentODSheet(){
+    public static void createPaymentODSheet() {
         Workbook wb = new XSSFWorkbook();
         Sheet sheet0 = wb.createSheet("График выплаты ОД");
         Row row0 = sheet0.createRow(0);
@@ -198,11 +194,11 @@ public class ExcelGenerator {
         cell03.setCellValue("Сумма к выплате");
 
         Cell cell11 = row1.createCell(0);
-        cell11.setCellValue(createDate(duration+5));
+        cell11.setCellValue(createDate(duration + 5));
         cell11.setCellStyle(cellStyle);
 
         Cell cell12 = row1.createCell(1);
-        cell12.setCellValue(createDate(duration+6));
+        cell12.setCellValue(createDate(duration + 6));
         cell12.setCellStyle(cellStyle);
 
         Cell cell13 = row1.createCell(2);
@@ -222,9 +218,14 @@ public class ExcelGenerator {
         }
     }
 
-    public static String createDate(long duration)  {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy  H:mm:ss");
-        Date date = new Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(duration));
-        return formatter.format(date);
+    public static Date createDate(int duration) {
+        Date currentDate = new Date();
+        // Создаем объект типа Calendar и устанавливаем его на текущую дату
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(currentDate);
+        // Добавляем 30 минут
+        calendar.add(Calendar.MINUTE, duration);
+        // Получаем новую дату
+        return calendar.getTime();
     }
 }
