@@ -22,5 +22,4 @@ public class CellFormat {
         log.info("Формат ячейки следующий:");
         System.out.println(styleString);
     }
-
 }

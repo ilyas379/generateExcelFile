@@ -9,6 +9,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Properties;
@@ -19,7 +21,8 @@ public class ExcelGenerator {
     static Double numberOfSaleDFA;
     static Double summCostSaleDFA;
     static int duration;
-    static Double percentForOneDfa;
+    static String npdDate;
+    static String odDate;
     static Double rate;
     static String fileName = "config.properties";
 
@@ -34,10 +37,10 @@ public class ExcelGenerator {
         costOfOneDfa = Double.valueOf(prop.getProperty("app.costOfOneDFA"));
         numberOfSaleDFA = Double.valueOf(prop.getProperty("app.numberOfSaleDFA"));
         duration = Integer.parseInt(prop.getProperty("app.duration"));
+        npdDate = prop.getProperty("app.npdDate");
+        odDate = prop.getProperty("app.odDate");
         summCostSaleDFA = costOfOneDfa * numberOfSaleDFA;
         rate = Double.parseDouble(prop.getProperty("app.rate"));
-        //проценты за 1 ЦФА
-        percentForOneDfa = (rate * costOfOneDfa) / 100;
     }
 
     @SneakyThrows
@@ -68,11 +71,11 @@ public class ExcelGenerator {
         cell02.setCellValue("Сумма к начислению");
 
         Cell cell11 = row1.createCell(0);
-        cell11.setCellValue(createDate(duration));
+        cell11.setCellValue(createDate(createOdNpdDate(npdDate), duration));
         cell11.setCellStyle(cellStyle);
 
         Cell cell12 = row1.createCell(1);
-        cell12.setCellValue(percentForOneDfa * numberOfSaleDFA);
+        cell12.setCellValue(rate * numberOfSaleDFA);
 
         sheet0.autoSizeColumn(0);
         sheet0.autoSizeColumn(1);
@@ -109,19 +112,19 @@ public class ExcelGenerator {
         cell04.setCellValue("Сумма к выплате");
 
         Cell cell11 = row1.createCell(0);
-        cell11.setCellValue(createDate(duration + 1));
+        cell11.setCellValue(createDate(createOdNpdDate(npdDate), 0));
         cell11.setCellStyle(cellStyle);
 
         Cell cell12 = row1.createCell(1);
-        cell12.setCellValue(createDate(duration + 2));
+        cell12.setCellValue(createDate(createOdNpdDate(npdDate), -900));
         cell12.setCellStyle(cellStyle);
 
         Cell cell13 = row1.createCell(2);
-        cell13.setCellValue(createDate(duration + 3));
+        cell13.setCellValue(createDate(createOdNpdDate(npdDate), duration * 2));
         cell13.setCellStyle(cellStyle);
 
         Cell cell14 = row1.createCell(3);
-        cell14.setCellValue((costOfOneDfa * rate) / 100);
+        cell14.setCellValue(rate);
 
         sheet0.autoSizeColumn(0);
         sheet0.autoSizeColumn(1);
@@ -155,7 +158,7 @@ public class ExcelGenerator {
         cell02.setCellValue("Сумма к начислению");
 
         Cell cell11 = row1.createCell(0);
-        cell11.setCellValue(createDate(duration + 4));
+        cell11.setCellValue(createDate(createOdNpdDate(odDate), duration * 3));
         cell11.setCellStyle(cellStyle);
 
         Cell cell12 = row1.createCell(1);
@@ -182,7 +185,7 @@ public class ExcelGenerator {
 
         CellStyle cellStyle = wb.createCellStyle();
         CreationHelper creationHelper = wb.getCreationHelper();
-        cellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("dd/mm/yy h:mm;@"));
+        cellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("dd.MM.yyyy HH:mm:ss"));
 
         Cell cell01 = row0.createCell(0);
         cell01.setCellValue("Дата закрытия реестра");
@@ -194,11 +197,11 @@ public class ExcelGenerator {
         cell03.setCellValue("Сумма к выплате");
 
         Cell cell11 = row1.createCell(0);
-        cell11.setCellValue(createDate(duration + 5));
+        cell11.setCellValue(createDate(createOdNpdDate(odDate), 0));
         cell11.setCellStyle(cellStyle);
 
         Cell cell12 = row1.createCell(1);
-        cell12.setCellValue(createDate(duration + 6));
+        cell12.setCellValue(createDate(createOdNpdDate(odDate), duration * 4));
         cell12.setCellStyle(cellStyle);
 
         Cell cell13 = row1.createCell(2);
@@ -218,12 +221,22 @@ public class ExcelGenerator {
         }
     }
 
-    public static Date createDate(int duration) {
-        Date currentDate = new Date();
+    public static Date createOdNpdDate(String date) {
+        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        Date createDate = null;
+        try {
+            createDate = formatter.parse(date + " 15:00:00");
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return createDate;
+    }
+
+    public static Date createDate(Date odNpdDate, int duration) {
         // Создаем объект типа Calendar и устанавливаем его на текущую дату
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(currentDate);
-        // Добавляем 30 минут
+        calendar.setTime(odNpdDate);
+        // Добавляем duration минут
         calendar.add(Calendar.MINUTE, duration);
         // Получаем новую дату
         return calendar.getTime();
